@@ -1,3 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    k8s.score.dev/workload-name: helloworld
+  labels:
+    app.kubernetes.io/instance: helloworld-81bbefb9ab
+    app.kubernetes.io/name: helloworld
+    env: prod
+  name: helloworld
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: helloworld-81bbefb9ab
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        k8s.score.dev/workload-name: helloworld
+      labels:
+        app.kubernetes.io/instance: helloworld-81bbefb9ab
+        app.kubernetes.io/managed-by: score-k8s
+        app.kubernetes.io/name: helloworld
+    spec:
+      containers:
+      - image: ghcr.io/pr3s3nt/helloworld:9b71f98a45f65f1170c4751a2eccd7dbd7430441
+        name: web
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      imagePullSecrets:
+      - name: registry-pull
+status: {}
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -42,45 +84,3 @@ spec:
     app.kubernetes.io/instance: helloworld-81bbefb9ab
 status:
   loadBalancer: {}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-    k8s.score.dev/workload-name: helloworld
-  labels:
-    app.kubernetes.io/instance: helloworld-81bbefb9ab
-    app.kubernetes.io/name: helloworld
-    env: prod
-  name: helloworld
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: helloworld-81bbefb9ab
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        k8s.score.dev/workload-name: helloworld
-      labels:
-        app.kubernetes.io/instance: helloworld-81bbefb9ab
-        app.kubernetes.io/managed-by: score-k8s
-        app.kubernetes.io/name: helloworld
-    spec:
-      containers:
-      - image: ghcr.io/pr3s3nt/helloworld:ea29ed6600596a94c7521c0fbcd0107d01a3250b
-        name: web
-        resources:
-          limits:
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-      imagePullSecrets:
-      - name: registry-pull
-status: {}
