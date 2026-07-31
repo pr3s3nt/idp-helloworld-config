@@ -1,0 +1,86 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  annotations:
+    k8s.score.dev/resource-guid: e820b878-ad06-4f3c-52bc-5cdc21acb995
+    k8s.score.dev/resource-uid: route.default#helloworld.route
+    k8s.score.dev/source-workload: helloworld
+  labels:
+    app.kubernetes.io/name: route-helloworld-e820b878
+  name: route-helloworld-e820b878
+spec:
+  hostnames:
+  - helloworld.127.0.0.1.nip.io
+  parentRefs:
+  - name: ingress-gateway
+    namespace: traefik
+  rules:
+  - backendRefs:
+    - name: helloworld
+      port: 80
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    k8s.score.dev/workload-name: helloworld
+  labels:
+    app.kubernetes.io/instance: helloworld-5863a7a992
+    app.kubernetes.io/name: helloworld
+  name: helloworld
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: helloworld-5863a7a992
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    k8s.score.dev/workload-name: helloworld
+  labels:
+    app.kubernetes.io/instance: helloworld-5863a7a992
+    app.kubernetes.io/name: helloworld
+    env: staging
+  name: helloworld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: helloworld-5863a7a992
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        k8s.score.dev/workload-name: helloworld
+      labels:
+        app.kubernetes.io/instance: helloworld-5863a7a992
+        app.kubernetes.io/managed-by: score-k8s
+        app.kubernetes.io/name: helloworld
+    spec:
+      containers:
+      - image: ghcr.io/pr3s3nt/helloworld:6174c4a5ab82e66ab78246aca30d0b4cc90c14ca
+        name: web
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+      imagePullSecrets:
+      - name: registry-pull
+status: {}
