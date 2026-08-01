@@ -28,7 +28,7 @@ spec:
         app.kubernetes.io/name: helloworld
     spec:
       containers:
-      - image: ghcr.io/pr3s3nt/helloworld:a6a3e22578b48a10de010b0a55e77ad54a40f3cf
+      - image: ghcr.io/pr3s3nt/helloworld:0000000000000000000000000000000000000000
         name: web
         resources:
           limits:
